@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
-from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 
+from chrome_wrapper import ChromeWrapper
 from database import SessionLocal
 from models.postal_code import PostalCode
 
@@ -9,15 +11,22 @@ class ETL:
     def __init__(self, postal_code_str: str):
         self.postal_code_str = postal_code_str
 
-    def get_timezone_title(self) -> str:
+    def set_timezone_title(self) -> str | None:
         with SessionLocal() as session:
             postal_code = session.query(PostalCode).filter(PostalCode.index == self.postal_code_str).first()
             if postal_code is None:
                 raise ValueError(f"Postal code {self.postal_code_str} not found")
-            with webdriver.Chrome() as driver:
+            if postal_code.timezone is not None:
+                return postal_code.timezone
+            with ChromeWrapper() as driver:
                 driver.get(f'https://postal-codes.cybo.com/russia/{self.postal_code_str}')
                 soup = BeautifulSoup(driver.page_source, 'html.parser')
-                table = soup.find('table', class_='nw-table')
+                tables = soup.find_all('table', class_='nw-table')
+                if not tables:
+                    print('No tables found')
+                    driver.save_body_screenshot()
+                    return
+            table = tables[0]
             timezone = table.find('td', text='Timezone').parent.find_all('td')[-1].text
             postal_code.timezone = timezone
             session.commit()

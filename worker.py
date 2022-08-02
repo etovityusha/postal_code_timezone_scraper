@@ -11,6 +11,7 @@ celery.conf.broker_url = os.environ.get("CELERY_BROKER_URL", "redis://redis:6379
 celery.conf.result_backend = os.environ.get("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
 
 
+@celery.task(name='run_all_without_timezone')
 def run_all_without_timezone():
     with SessionLocal() as session:
         postal_codes = session.query(PostalCode).filter(PostalCode.timezone.is_(None)).all()
@@ -21,5 +22,5 @@ def run_all_without_timezone():
 
 @celery.task(name='get_timezone')
 def get_timezone(postal_code: str):
-    timezone_title = ETL(postal_code).get_timezone_title()
+    timezone_title = ETL(postal_code).set_timezone_title()
     return timezone_title

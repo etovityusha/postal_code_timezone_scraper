@@ -23,6 +23,8 @@ services:
     build: .
     command: celery -A worker worker -B -l INFO
     env_file: .env
+    volumes:
+      - .:/app
     depends_on:
       - web
       - redis
