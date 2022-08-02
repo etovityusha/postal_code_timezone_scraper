@@ -8,9 +8,9 @@ WORKDIR .
 RUN apt-get -y update
 RUN apt-get -y upgrade
 
-COPY . .
-
 RUN apt-get install -y chromium
 RUN apt-get install -y chromium-driver
 
+COPY requirements.txt .
 RUN pip install -r requirements.txt
+COPY . .
