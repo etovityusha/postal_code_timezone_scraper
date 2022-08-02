@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
+from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 from chrome_wrapper import ChromeWrapper
 from database import SessionLocal
@@ -19,7 +21,12 @@ class ETL:
             if postal_code.timezone is not None:
                 return postal_code.timezone
             with ChromeWrapper() as driver:
-                driver.get(f'https://postal-codes.cybo.com/russia/{self.postal_code_str}')
+                driver.get(f'https://postal-codes.cybo.com/search/?q={self.postal_code_str}&pl=&i=&t=')
+                try:
+                    WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.CLASS_NAME, 'nw-table')))
+                except TimeoutException:
+                    driver.save_body_screenshot()
+                    return
                 soup = BeautifulSoup(driver.page_source, 'html.parser')
                 tables = soup.find_all('table', class_='nw-table')
                 if not tables:
