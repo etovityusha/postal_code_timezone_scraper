@@ -7,6 +7,8 @@ from database import Base
 
 
 class City(Base):
+    __tablename__ = 'city'
+
     created_at = sa.Column(
         sa.DateTime, default=datetime.utcnow, server_default=sa.func.now()
     )
