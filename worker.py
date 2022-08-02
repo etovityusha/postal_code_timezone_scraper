@@ -13,7 +13,7 @@ celery.conf.result_backend = os.environ.get("CELERY_RESULT_BACKEND", "redis://re
 
 def run_all_without_timezone():
     with SessionLocal() as session:
-        postal_codes = session.query(PostalCode).filter(PostalCode.timezone == None).all()
+        postal_codes = session.query(PostalCode).filter(PostalCode.timezone.is_(None)).all()
         for postal_code in postal_codes:
             get_timezone.apply_async(args=[postal_code.index])
     return True
