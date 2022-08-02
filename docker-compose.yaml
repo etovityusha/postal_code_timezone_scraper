@@ -1,0 +1,36 @@
+version: "3.7"
+
+services:
+  db:
+    image: postgres:13.3
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file: .env
+    ports:
+      - "7101:7101"
+    command: -p 7101
+
+  web:
+    build: .
+    command: bash -c "alembic upgrade head && uvicorn run:app --reload --host 0.0.0.0 --port 7100 --proxy-headers"
+    ports:
+      - "7100:7100"
+    depends_on:
+      - db
+      - redis
+
+  celery:
+    build: .
+    command: celery -A worker worker -B -l INFO
+    env_file: .env
+    depends_on:
+      - web
+      - redis
+      - db
+
+  redis:
+    image: redis:6.2
+
+
+volumes:
+  postgres_data:
