@@ -40,13 +40,13 @@ class ChromeWrapper(webdriver.Chrome):
     @staticmethod
     def chrome_settings() -> Options:
         chrome_options = Options()
-        user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) ' \
-                     'Chrome/83.0.4103.116 Safari/537.36'
+        user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 ' \
+                     '(KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
         chrome_options.add_argument(f'--user-agent={user_agent}')
-        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-        chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--headless')
         chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
         chrome_options.add_argument('--ignore-ssl-errors=yes')
         chrome_options.add_argument('--ignore-certificate-errors')
         chrome_options.add_argument('--window-size=1920,1080')
