@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from chrome_wrapper import ChromeWrapper
 from database import SessionLocal
 from models.postal_code import PostalCode
+from proxy import Proxy
 
 
 class ETL:
@@ -24,7 +25,8 @@ class ETL:
                 postal_code.timezone = other_postal_with_tz.timezone
                 session.commit()
                 return other_postal_with_tz.timezone
-            with ChromeWrapper() as driver:
+            proxy = Proxy.get_random_http_proxy(from_top=10)
+            with ChromeWrapper(proxy=proxy) as driver:
                 driver.get(f'https://postal-codes.cybo.com/russia/{self.postal_code_str}')
                 redirect_url = driver.current_url
                 cached_url = f'https://webcache.googleusercontent.com/search?q=cache%3A{redirect_url}'
